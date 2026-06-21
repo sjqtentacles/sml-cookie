@@ -1,0 +1,7 @@
+package github.com/sjqtentacles/sml-cookie
+
+require {
+  github.com/sjqtentacles/sml-http
+  github.com/sjqtentacles/sml-crypto
+  github.com/sjqtentacles/sml-datetime
+}
