@@ -14,7 +14,9 @@ test-first against the RFC 6265 / RFC 7231 examples. Dual-compiler:
 - **`Cookie.set_cookie`** — a record with the standard `Set-Cookie` attributes:
   `Path`, `Domain`, `Max-Age`, `Expires`, `Secure`, `HttpOnly`, `SameSite`.
 - **`Cookie.build` / `Cookie.parseSetCookie`** — serialize / parse a
-  `Set-Cookie` value, round-tripping all attributes.
+  `Set-Cookie` value, round-tripping all attributes. `Max-Age` is bounded to
+  the signed 32-bit range, so an oversized value yields `maxAge = NONE`
+  identically on MLton and Poly/ML rather than overflowing the default `int`.
 - **`Cookie.httpDate`** — format an IMF-fixdate (`"Sun, 06 Nov 1994 08:49:37 GMT"`,
   RFC 7231 §7.1.1.1) for `Expires`, derived from a [sml-datetime](https://github.com/sjqtentacles/sml-datetime)
   `date` plus a time of day.

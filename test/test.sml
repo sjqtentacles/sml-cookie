@@ -67,6 +67,24 @@ struct
       val () = checkBool "missing name=val rejected"
         (true, not (isSome (Cookie.parseSetCookie "Secure; HttpOnly")))
 
+      (* An oversized Max-Age must not overflow the default `int`: Int.fromString
+         raises Overflow past 2^31 on a 32-bit int (MLton) but accepts it on a
+         63-bit int (Poly/ML). The parser bounds it, so maxAge is NONE (as for
+         any unparseable Max-Age) byte-identically on both compilers. *)
+      val scBig = valOf (Cookie.parseSetCookie "x=y; Max-Age=999999999999")
+      val () = checkBool "oversized max-age -> NONE"
+        (true, #maxAge scBig = NONE)
+      val () = checkString "oversized max-age keeps other fields"
+        ("x", #name scBig)
+      val scBoundary = valOf (Cookie.parseSetCookie "x=y; Max-Age=2147483648")
+      val () = checkBool "max-age at 2^31 -> NONE"
+        (true, #maxAge scBoundary = NONE)
+      val () = checkBool "oversized max-age does not raise"
+        (true, (Cookie.parseSetCookie "x=y; Max-Age=999999999999"; true)
+               handle _ => false)
+      val () = checkInt "normal max-age still parses"
+        (3600, valOf (#maxAge (valOf (Cookie.parseSetCookie "x=y; Max-Age=3600"))))
+
       (* round-trip *)
       val () = checkString "build/parse round-trip"
         (Cookie.build full, Cookie.build (valOf (Cookie.parseSetCookie (Cookie.build full))))
