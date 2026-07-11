@@ -62,6 +62,35 @@ val pairs = Cookie.parseCookie out
 val SOME "user-42" = SignedCookie.read { key = "secret", name = "auth" } pairs
 ```
 
+Running [`examples/demo.sml`](examples/demo.sml) with `make example` builds a
+bare and a fully-attributed `Set-Cookie`, round-trips one through
+`parseSetCookie`, formats an `Expires` IMF-fixdate, and signs/verifies a
+cookie including a tamper-detection check (output is byte-identical under
+MLton and Poly/ML):
+
+```
+sml-cookie demo
+
+Bare cookie:
+  SID=31d4d96e407aad42
+
+Fully-attributed cookie:
+  SID=31d4d96e407aad42; Path=/; Domain=example.com; Max-Age=3600; Secure; HttpOnly; SameSite=Lax
+
+Round-trip via parseSetCookie:
+  name=SID value=31d4d96e407aad42 path=/ domain=example.com maxAge=3600 secure=true httpOnly=true sameSite=Lax
+
+Expires formatted as an IMF-fixdate:
+  Sun, 06 Nov 1994 08:49:37 GMT
+
+Signed cookie round-trip:
+  Set-Cookie: auth=dXNlci00Mg.jVma5oL9Qhc4WcDmpt6NjyYD99g8CHCHB4Jrjstc-Q0
+  verified value = user-42
+
+Tamper detection:
+  tampered cookie rejected (NONE)
+```
+
 ## Build & test
 
 ```sh
